@@ -1,9 +1,3 @@
-###Here is example output from a real email, after converting to a list and removing excess lines.
-###0
-###['{\'email_message\': "Wix.com', 'You just got a new reservation!', "Can't see this email? Click here", 'Great News!', 'You Just Got A New Reservation', 'Great News!', 'You Just Got A', 'New Reservation', 'Dates', 'Check-In: 2020-05-29', '>', 'Check-Out: 2020-05-31', 'Summary', '# 141396', 'Price', 'USD 144.0 x 2 Night(s)', 'Room', '2019 VIBE 29BH DOUBLE SLIDE', 'Extras', '0.0', 'Tax(11.0%)', 'USD 31.68', 'Total Price', 'USD 319.68', 'Deposit Paid Via Stripe', 'Guest Info', 'Full Name', 'John Doe', 'Email', 'johndoe@yopmail.com', 'Phone', '5551234567', 'Location', 'U.S.A.', 'Special Requests', 'I have rented from you in the past. Might need a late return time, maybe around 6:00 pm. Having a family reunion at the lake.', 'Dates', 'Check-In: 2020-05-29', '>', 'Check-Out: 2020-05-31', '# 141396', 'Summary', 'Price', 'USD 144.0 x 2 Night(s)', 'Room', '2019 VIBE 29BH DOUBLE SLIDE', 'Extras', '0.0', 'Tax(11.0%)', 'USD 31.68', 'Total Price', 'USD 319.68', 'Deposit Paid Via Stripe', 'Guest Info', 'Full Name', 'John Doe', 'Email', 'johndoe@yopmail.com', 'Phone', '5551234567', 'Location', 'U.S.A.', 'Special Requests', 'I have rented from you in the past. Might need a late return time, maybe around 6:00 pm. Having a family reunion at the lake.', 'Rate your experience with Wix Hotels', 'Your review is super helpful for us to achieve greatness', 'Add Review', 'Rate your experience with Wix Hotels', 'Your review is super helpful for us to achieve greatness', 'Add', 'Review', 'Please do not reply to this email', '500 Terry A Francois Blvd San Francisco,', 'CA\xa094158', 'Wix.com Ltd., Wix.com Inc.', 'www.wix.com', 'View our', 'privacy', 'policy', '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"}']
-
-
-
 import re
 import json
 
@@ -55,6 +49,7 @@ nights_str = str(nights.group(0))
 nights_spl_word = ' x '
 nights_final = nights_str.partition(nights_spl_word)[2]
 
+
 ### Convert to appropriate data type so we can do some simple calucations
 
 
@@ -62,9 +57,15 @@ nights_final = nights_str.partition(nights_spl_word)[2]
 rate_float = float(rate_final)
 nights_int = int(nights_final)
 
-###base rate is nights x nightly rate.  Deposit is a percentage of this value (set above)
+###base rate is nights x nightly rate.
 base_rate_total =  str(rate_float * nights_int)
-deposit_total = str(rate_float * nights_int * deposit_pct)
+
+### Deposit calculated when applicable.  Searches for indication of deposit received in Wix Email
+if "deposit paid via stripe" in input_data.lower():
+    deposit_total = str(rate_float * nights_int * deposit_pct)
+else:
+    deposit_total = "0"
+
 
 ###Remember, total is actually the total amount less the deposit paid.  So actually total remaining
 total_final = float(total_final) - float(deposit_total)
